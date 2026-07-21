@@ -107,13 +107,13 @@ recursively subdivides a domain into a grid of sub-boxes — the
 foundation for adaptive branch-and-bound refinement of affine bounds
 (useful when a single linearization over a wide domain is too loose).
 
-` examples_AA_classV3.txt'
+`examples_AA_classV3.txt`
 It exercises basic arithmetic (including the x - x dependency-cancellation example), every elementary function (exp, log, sqrt, abs, trig, hyperbolic, inverse trig) in both cheb=True and cheb=False modes, the warn=True/False domain-clipping behavior for log/sqrt/arcsin/arccos, and — most thoroughly — every branch of pow() (all six sign/parity combinations, straddling-zero cases, the r=1 and irrational-exponent edge cases), cross-checking each affine bound against a dense numpy sweep of the true function to catch soundness violations.
 
-` AA_scalar_test_functions_trial1.txt'
+`AA_scalar_test_functions_trial1.txt`
 An applied benchmark script that runs the affine-arithmetic engine on three classic optimisation test functions (Branin, Ackley in both 2-D and 3-D, and Eggholder), each built compositionally from the class's primitives (pow, cos, sin, sqrt, abs, exp). For each function, it does adaptive domain refinement: repeatedly subdividing the unit hypercube via split_interval into 2^m pieces per dimension, re-evaluating both the Chebyshev and min-range bounds on every sub-box, and tracking how the aggregate enclosure tightens (and how the two strategies' ranges compare/intersect) as the mesh refines from m=0 to m=8.
 
-` AA_WingWeight_model.txt'
+`AA_WingWeight_model.txt`
 The same adaptive-refinement methodology applied to a real 10-dimensional engineering model, the classic wing weight formula from aerospace design (a product of power-law terms in wing area, fuselage weight, taper ratio, sweep angle, dynamic pressure, thickness ratio, load factor, gross weight, and paint weight fraction). It's a good stress test for pow() specifically, since nearly every factor is raised to a small fractional exponent (0.758, 0.0035, 0.6, 0.006, 0.04, -0.3, 0.49), and for the class's composition machinery generally, since it chains multiplication, cos, and negative-exponent pow across ten correlated affine variables at once — at dim1=3 splits per dimension, that's already 8^10 sub-boxes being evaluated.
 
 ## Example
