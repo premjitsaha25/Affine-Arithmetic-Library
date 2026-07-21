@@ -133,11 +133,9 @@ print(w.interval)
 Core arithmetic, all listed elementary functions, and the general
 rational/irrational `pow()` are implemented and under active test
 (`test_affine_arithmetic.py` exercises every branch of `pow()` — all
-sign/parity/cheb combinations — plus `warn=True/False` behavior for
+sign/parity/cheb combinations — plus `warn=True/False` behaviour for
 every domain-restricted function, cross-checked against dense pointwise
-sampling of the true function). Ongoing work includes zonotope-based
-multidimensional generalization and a CVXPY-based convex-optimization
-formulation for tighter multivariate enclosures.
+sampling of the true function). Ongoing work includes width-based sensitivity analysis for interval variables.
 
 ## References
 
