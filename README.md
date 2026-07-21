@@ -136,6 +136,67 @@ print(z.interval)
 w = y.pow(-1/3)
 print(w.interval)
 ```
+```python
+from Affine_ArithmeticClassV3 import AffineScalar, AffineArray
+
+# ---------------------------------------------------------------
+# Path 1: via AffineArray (the usual way -- variables share a
+# common pool of noise symbols, so cross-variable correlations,
+# like x - x cancelling exactly, are tracked automatically)
+# ---------------------------------------------------------------
+X = AffineArray.from_intervals([(-1.0, 0.5), (0.4, 2.0)])
+x, y = X[0], X[1]
+
+print("x.interval =", x.interval)   # (-1.0, 0.5)
+print("y.interval =", y.interval)   # (0.4, 2.0)
+
+# ---------------------------------------------------------------
+# Path 2: standalone AffineScalar -- construct one directly from
+# a center, propagated-noise coefficients (xi), and independent
+# remainder coefficients (delta). Useful when a variable doesn't
+# belong to a shared AffineArray -- e.g. a one-off constant, or a
+# quantity built up manually rather than from an interval.
+# ---------------------------------------------------------------
+
+# A standalone variable centered at 3.0, with a single noise term
+# of coefficient 2.0 (so its range is [3-2, 3+2] = [1, 5]) and no
+# remainder/rounding error yet:
+z = AffineScalar(x0=3.0, xi=[2.0], delta=[])
+print("z.interval =", z.interval)   # (1.0, 5.0)
+
+# A standalone variable with BOTH a propagated noise term and an
+# independent remainder term (e.g. the output of some nonlinear
+# approximation you're constructing by hand): center 0.0, one
+# noise coefficient of 1.5, one remainder coefficient of 0.2 --
+# total radius = 1.5 + 0.2 = 1.7
+w = AffineScalar(x0=0.0, xi=[1.5], delta=[0.2])
+print("w.interval =", w.interval)   # (-1.7, 1.7)
+
+# A degenerate/exact scalar -- no uncertainty at all (xi and delta
+# both empty, which is also what happens internally whenever a
+# function collapses to a point, e.g. pow() on a zero-width input):
+c = AffineScalar(x0=5.0, xi=[], delta=[])
+print("c.interval =", c.interval)   # (5.0, 5.0)
+
+# ---------------------------------------------------------------
+# Basic operations -- work identically whether the operands came
+# from an AffineArray view or a standalone AffineScalar
+# ---------------------------------------------------------------
+
+print("\n--- basic operations ---")
+
+print("x + y        =", (x + y).interval)
+print("x + z        =", (x + z).interval)      # mixing array-view and standalone operands
+print("z - w        =", (z - w).interval)
+print("2 * z        =", (2 * z).interval)       # scalar * affine (__rmul__)
+print("z * w        =", (z * w).interval)       # affine * affine -> appends a fresh error symbol
+print("z / 2        =", (z / 2).interval)
+print("1.0 / w      =", (1.0 / w).interval)     # __rtruediv__, routes through w.inv()
+
+# Nonlinear functions work the same way on a standalone scalar:
+print("z.sqrt().interval        =", z.sqrt().interval)
+print("z.pow(2, cheb=True).interval =", z.pow(2, cheb=True).interval)
+```
 
 ## Status
 
